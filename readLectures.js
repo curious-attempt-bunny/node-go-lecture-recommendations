@@ -44,10 +44,13 @@ fs.writeFileSync('mablery_bol.not.ChristianB.txt', JSON.stringify(_.difference(_
 
 var raccoon = require('raccoon');
 
-raccoon.config.numOfRecsStore = 200;
+raccoon.config.numOfRecsStore = 1000;
+raccoon.config.nearestNeighbors = 2;
+raccoon.config.sampleContent = false;
+raccoon.config.className = 'lectures';
 var async = require('async');
 function addLikes(user, likes, next) {
-  async.eachLimit(likes, 20, function(like, next) {
+  async.eachLimit(likes, 1, function(like, next) {
   	console.log(user + " liked "+like);
   	raccoon.liked(user, like, next);
   }, function(err) {
@@ -56,16 +59,18 @@ function addLikes(user, likes, next) {
   });
 };
 
-async.eachSeries([["bol", bol], ["ChristianB", ChristianB], ["malbery", malbery]],
+async.eachSeries([["ChristianB", ChristianB], ["malbery", malbery], ["bol", bol]],
 	function(userData, next) {
 		addLikes(userData[0], userData[1], next);
 	},
 	function(err) {
 		console.log("Overall: "+err);
 
-		async.eachSeries(["bol", "ChristianB", "malbery"], function(user, next) {
-			raccoon.recommendFor(user, 10, function(results){
-				console.log("Recommendations for "+user+":");
+		async.eachSeries([["bol", bol], ["ChristianB", ChristianB], ["malbery", malbery]], function(userData, next) {
+			raccoon.recommendFor(userData[0], 5, function(results){
+				console.log("Recommendations for "+userData[0]+":");
+		  	// console.dir(_.difference(results, userData[1]));
+		  	results.push(userData[0])
 		  	console.dir(results);
 		  	next();
 			});	
