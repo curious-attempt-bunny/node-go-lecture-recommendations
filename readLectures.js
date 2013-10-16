@@ -43,10 +43,12 @@ fs.writeFileSync('mablery_bol.not.ChristianB.txt', JSON.stringify(_.difference(_
 */
 
 var raccoon = require('raccoon');
+
+raccoon.config.numOfRecsStore = 200;
 var async = require('async');
 function addLikes(user, likes, next) {
   async.eachLimit(likes, 20, function(like, next) {
-  	//console.log(like);
+  	console.log(user + " liked "+like);
   	raccoon.liked(user, like, next);
   }, function(err) {
   	console.log("Done "+user+": "+err);
